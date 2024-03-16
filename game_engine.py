@@ -17,7 +17,8 @@ class Ship:
             return [start_index + i*10 for i in range(self.size)]
         
 class Player():
-    def __init__(self):
+    def __init__(self,name):
+        self.name = name
         self.ships = []
         self.search = ["U"  for i in range(100)] # "U" for "Unknown"
         self.place_ships(sizes = [5, 4, 3, 3, 2])
@@ -63,13 +64,104 @@ class Player():
         for row in range(10):
             print(" ".join(indexes[(row-1)*10:row*10]))
 
+
+
+class AIPlayer(Player):
+    # needs to change the player1 board
+    # def __init__(self):
+    #     self.opponent_ships = [5,4,3,3,2]
+    #     self.probability = [10]
+
+    def AI_init(self):
+        if not hasattr(self, "probability"):    # if probability matrix does not exist we create it 
+            self.create_probability()
+
+        if not hasattr(self, "mask"):    # if mask cross does not exist we create it 
+            self._create_mask()
+
+        if not hasattr(self, "moves"):
+                self.moves = set(range(100))
+
+    def AI_move(self, mode = None):
+
+        if (mode == "diagonal_skewer"):
+           None
+        elif (mode == None):
+            selected_move = random.choice(list(self.moves))
+            self.moves.remove(selected_move)
+        return int(selected_move)
+
+    def create_probability(self):
+        self.probability = [8,11,14,15,16,16,15,14,11,8,
+                            11,14,16,17,18,18,17,16,14,11,
+                            14,16,18,19,19,19,19,18,16,14,
+                            15,17,19,20,20,20,20,19,17,15,
+                            16,18,19,20,21,21,20,19,18,16,
+                            16,18,19,20,21,21,20,19,18,16,
+                            15,17,19,20,20,20,20,19,17,15,
+                            14,16,18,19,19,19,19,18,16,14,
+                            11,14,16,17,18,18,17,16,14,11,
+                            8,11,14,15,16,16,15,14,11,8]
+    def _create_mask(self):
+        self.mask = []      # create mask full of zeros
+        for i in range(100):
+            self.mask.append(0)
+           
+
+    #mask works but only assigns ones
+    
+    def create_mask(self, i):
+        row_index = i // 10
+        col_index = i % 10
+        # Set the values for the row
+        for j in range(row_index * 10, (row_index + 1) * 10):
+            if ((i-j) == 0):
+                distance = 0
+            else: 
+                distance = round(1/(abs(i-j)*10),2)
+            self.mask[j] = 1100*distance
+        # Set the values for the column
+        for j in range(col_index, 100, 10):
+            if ((i-j) == 0):
+                distance = 0
+            else:
+                distance = round(1/abs(i-j),2)
+            self.mask[j] = 1100*distance
+        
+
+    # def create_mask(self, i):
+    #     row_index = i // 10
+    #     col_index = i % 10
+        
+    #     # Set the values for the cross
+    #     for row in range(10):
+    #         for col in range(10):
+    #             distance = abs(row - row_index) + abs(col - col_index)
+    #             self.mask[row * 10 + col] += max(0, 30 - distance * 5)
+        
+    #     return self.mask
+
+
+    def heuristic(self, search, mask):
+        temp = []
+        for i in range(len(search)):
+            temp[i] = search[i] + mask[i]
+        return min(temp)
+
+        
+        return None
+    def choose_possible_move(self):
+        None
+
 class BattleShipGame():
 
     def __init__(self):
-        self.player1 = Player()
-        self.player2 = Player()
+        self.player1 = Player("Player1")
+        self.player2 = AIPlayer("AI")
+        self.player2.AI_init()
         self.player1_turn = 1
         self.over = 0
+        self.winner = None
 
     def change_turn(self):
         if self.player1_turn == 1:
@@ -85,6 +177,8 @@ class BattleShipGame():
         # set miss "M" or hit "H"
         if i in opponent.indexes:
             active_player.search[i] = "H"
+            if hasattr(active_player, "mask"):
+                active_player.create_mask(i)
             # check if ship is sunk ("S")
             for ship in opponent.ships:
                 sunk = True
@@ -98,9 +192,20 @@ class BattleShipGame():
                         
         else:
             active_player.search[i] = "M"
+            # Change turn
             self.change_turn()
+        
+        # Check if game over
+            game_over = True
+            for i in opponent.indexes:
+                if active_player.search[i] == "U":
+                    game_over = False
+            if game_over:
+                self.over = 1
+                self.winner = active_player
 
-        # change the active player
 
+    def check_game_over(self):
+        pass
 
 
