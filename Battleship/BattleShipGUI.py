@@ -78,7 +78,7 @@ while is_game:
                 game.make_move(index)
                 
         elif not game.player1_turn:
-            time.sleep(2)
+            time.sleep(1)
             game.make_move(game.player2.AI_move())
     
             
@@ -114,3 +114,4 @@ while is_game:
         pygame.display.flip()
         
 pygame.quit()
+

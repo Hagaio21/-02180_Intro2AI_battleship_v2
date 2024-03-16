@@ -66,18 +66,61 @@ class Player():
 
 class AIPlayer(Player):
     # needs to change the player1 board
+    # def __init__(self):
+    #     self.opponent_ships = [5,4,3,3,2]
+    #     self.probability = [10]
 
     def AI_move(self, mode = None):
+
+        if not hasattr(self, "probability"):    # if probability matrix does not exist we create it 
+            self.create_probability()
+
+        if not hasattr(self, "mask"):    # if mask cross does not exist we create it 
+            self._create_mask()
+
         if (mode == "diagonal_skewer"):
            None
         elif (mode == None):
-            moves = set(range(100))
-            selected_move = random.choice(list(moves))
-            moves.remove(selected_move)
+            if not hasattr(self, "moves"):
+                self.moves = set(range(100))
+            selected_move = random.choice(list(self.moves))
+            self.moves.remove(selected_move)
         return int(selected_move)
 
+    def create_probability(self):
+        self.probability = [8,11,14,15,16,16,15,14,11,8,
+                            11,14,16,17,18,18,17,16,14,11,
+                            14,16,18,19,19,19,19,18,16,14,
+                            15,17,19,20,20,20,20,19,17,15,
+                            16,18,19,20,21,21,20,19,18,16,
+                            16,18,19,20,21,21,20,19,18,16,
+                            15,17,19,20,20,20,20,19,17,15,
+                            14,16,18,19,19,19,19,18,16,14,
+                            11,14,16,17,18,17,16,14,11,
+                            8,11,14,15,16,16,15,14,11,8]
+    def _create_mask(self):
+        self.mask = []      # create mask full of zeros
+        for i in range(100):
+            self.mask.append(0)
+           
+
+    
+    def create_mask(self, i):
+        row_index = i // 10
+        col_index = i % 10
+        # Set the values for the row
+        for j in range(row_index * 10, (row_index + 1) * 10):
+            self.mask[j] += 1
+        # Set the values for the column
+        for j in range(col_index, 100, 10):
+            self.mask[j] += 1
+        return self.mask
+
+
     def heuristic(self):
-        None
+
+        
+        return None
     def choose_possible_move(self):
         None
 
