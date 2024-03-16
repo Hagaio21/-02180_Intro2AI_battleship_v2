@@ -113,14 +113,38 @@ class AIPlayer(Player):
         col_index = i % 10
         # Set the values for the row
         for j in range(row_index * 10, (row_index + 1) * 10):
-            self.mask[j] += 1
+            if ((i-j) == 0):
+                distance = 0
+            else: 
+                distance = round(1/(abs(i-j)*10),2)
+            self.mask[j] = 1100*distance
         # Set the values for the column
         for j in range(col_index, 100, 10):
-            self.mask[j] += 1
+            if ((i-j) == 0):
+                distance = 0
+            else:
+                distance = round(1/abs(i-j),2)
+            self.mask[j] = 1100*distance
         return self.mask
 
+    # def create_mask(self, i):
+    #     row_index = i // 10
+    #     col_index = i % 10
+        
+    #     # Set the values for the cross
+    #     for row in range(10):
+    #         for col in range(10):
+    #             distance = abs(row - row_index) + abs(col - col_index)
+    #             self.mask[row * 10 + col] += max(0, 30 - distance * 5)
+        
+    #     return self.mask
 
-    def heuristic(self):
+
+    def heuristic(self, search, mask):
+        temp = []
+        for i in range(len(search)):
+            temp[i] = search[i] + mask[i]
+        return min(temp)
 
         
         return None
