@@ -106,6 +106,7 @@ class AIPlayer(Player):
             self.mask.append(0)
            
 
+    #mask works but only assigns ones
     
     def create_mask(self, i):
         row_index = i // 10
