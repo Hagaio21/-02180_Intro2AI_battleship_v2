@@ -70,19 +70,21 @@ class AIPlayer(Player):
     #     self.opponent_ships = [5,4,3,3,2]
     #     self.probability = [10]
 
-    def AI_move(self, mode = None):
-
+    def AI_init(self):
         if not hasattr(self, "probability"):    # if probability matrix does not exist we create it 
             self.create_probability()
 
         if not hasattr(self, "mask"):    # if mask cross does not exist we create it 
             self._create_mask()
 
+        if not hasattr(self, "moves"):
+                self.moves = set(range(100))
+
+    def AI_move(self, mode = None):
+
         if (mode == "diagonal_skewer"):
            None
         elif (mode == None):
-            if not hasattr(self, "moves"):
-                self.moves = set(range(100))
             selected_move = random.choice(list(self.moves))
             self.moves.remove(selected_move)
         return int(selected_move)
@@ -96,7 +98,7 @@ class AIPlayer(Player):
                             16,18,19,20,21,21,20,19,18,16,
                             15,17,19,20,20,20,20,19,17,15,
                             14,16,18,19,19,19,19,18,16,14,
-                            11,14,16,17,18,17,16,14,11,
+                            11,14,16,17,18,18,17,16,14,11,
                             8,11,14,15,16,16,15,14,11,8]
     def _create_mask(self):
         self.mask = []      # create mask full of zeros
@@ -129,6 +131,7 @@ class BattleShipGame():
     def __init__(self):
         self.player1 = Player()
         self.player2 = AIPlayer()
+        self.player2.AI_init()
         self.player1_turn = 1
         self.over = 0
 
