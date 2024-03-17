@@ -192,35 +192,62 @@ class AIPlayer(Player):
     
     # creates mask of values for the new search grid
     def update_mask(self, i):
-        row_index = i // 10
-        col_index = i % 10
-        if self.search[i] == "M" and self.search[i+1] == "H":
-            for j in range(row_index*10, i):
-                self.mask[j] = 0 
+        for i, indicies in enumerate(self.search):
+            if indicies == "M":
+        # row_index = i // 10
+        # col_index = i % 10
+        # if self.search[i] == "M" and self.search[i+1] == "H":
+        #     for j in range(row_index*10, i):
+        #         self.mask[j] = 0 
 
-        elif self.search[i] == "M" and self.search[i-1] =="H":
-            for j in range(i, (row_index+1)*10):
-                self.mask[j] = 0 
+        # elif self.search[i] == "M" and self.search[i-1] =="H":
+        #     for j in range(i, (row_index+1)*10):
+        #         self.mask[j] = 0 
 
         
-        elif self.search[i] == "M" and self.search[i+10] == "H":
-            for j in range(col_index,i,10):
-                self.mask[j] = 0 
+        # elif self.search[i] == "M" and self.search[i+10] == "H":
+        #     for j in range(col_index,i,10):
+        #         self.mask[j] = 0 
         
-        elif self.search[i] == "M" and self.search[i-10] == "H":
-            for j in range(i,100, 10):
-                self.mask[j] = 0 
+        # elif self.search[i] == "M" and self.search[i-10] == "H":
+        #     for j in range(i,100, 10):
+        #         self.mask[j] = 0 
+
+
+                row_index = i // 10
+                col_index = i % 10
+                
+                # Check right neighbor
+                if col_index < 9 and self.search[i+1] == "H":
+                    for j in range(row_index * 10, i):
+                        self.mask[j] = 0 
+                        
+                # Check left neighbor
+                if col_index > 0 and self.search[i-1] == "H":
+                    for j in range(i, (row_index + 1) * 10):
+                        self.mask[j] = 0 
+                        
+                # Check bottom neighbor
+                if row_index < 9 and self.search[i+10] == "H":
+                    for j in range(col_index, i, 10):
+                        self.mask[j] = 0 
+                        
+                # Check top neighbor
+                if row_index > 0 and self.search[i-10] == "H":
+                    for j in range(i, 100, 10):
+                        self.mask[j] = 0 
+                        
+                print('went into update mask')
+
         
 
-    
 
-
-        print('went into update mask')
 
     def reset_mask(self):
-        # self.mask = [0 for i in range(100)]
-        self.flag = 0
+        self.mask = [0 for i in range(100)]
+        # self.flag = 0
         # resets the mask
+        # del self.mask
 
 
     def create_mask(self, i):
@@ -243,6 +270,7 @@ class AIPlayer(Player):
                     distance = round(1/abs(i-j),2)
                 self.mask[j] = 1100*distance
             self.flag = 1
+            print("creating mask")
         
 
 
@@ -279,7 +307,7 @@ class BattleShipGame():
         # set miss "M" or hit "H"
         if i in opponent.indexes:
             active_player.search[i] = "H"
-            if active_player.name == "AI" and hasattr(active_player, "mask"):
+            if active_player.name == "AI" and active_player.flag == 0:
                 active_player.create_mask(i)
             # check if ship is sunk ("S")
             for ship in opponent.ships:
@@ -289,8 +317,14 @@ class BattleShipGame():
                         sunk = False
                         break
                 if sunk:
-                    if hasattr(active_player, "flag"):
+                    if active_player.name == "AI":
                         active_player.flag = 0
+                        active_player.reset_mask()
+
+                        print("ship is sunk should create new mask")
+                        # active_player.reset_mask()
+                    # if hasattr(active_player, "flag"):
+                    #     active_player.flag = 0
                         # active_player.reset_mask()
                 
                     for i in ship.indexes:
@@ -304,6 +338,7 @@ class BattleShipGame():
             set_probability(active_player)
             set_mask(active_player)
             active_player.update_mask(i)
+        
             print(f"best AI move is {best_move(active_player)}")
         #####################################################
             
