@@ -159,4 +159,5 @@ while is_game:
         # update screen
         pygame.display.flip()
         
+game.player2.save_AI_log()
 pygame.quit()
