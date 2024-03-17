@@ -1,6 +1,37 @@
 # Game Engine
 import random
 
+START_PROBABILITY =         [8,11,14,15,16,16,15,14,11,8,
+                            11,14,16,17,18,18,17,16,14,11,
+                            14,16,18,19,19,19,19,18,16,14,
+                            15,17,19,20,20,20,20,19,17,15,
+                            16,18,19,20,21,21,20,19,18,16,
+                            16,18,19,20,21,21,20,19,18,16,
+                            15,17,19,20,20,20,20,19,17,15,
+                            14,16,18,19,19,19,19,18,16,14,
+                            11,14,16,17,18,18,17,16,14,11,
+                            8,11,14,15,16,16,15,14,11,8]
+
+def heuristic(player, move):
+    p = player
+    m = move
+    if hasattr(p, 'mask'):
+        h = p.probability[m]+p.mask[m]
+    else:
+        return None
+    return h
+
+def best_move(player):
+    best_m = player.moves[0]
+    best_h = 0
+    for m in player.moves:
+        h = heuristic(m)
+        if  h >= best_h:
+            best_m = m
+            best_h = h
+    return m
+
+
 class Ship:
     def __init__(self, size):
         self.row = random.randrange(0,9)
@@ -73,39 +104,22 @@ class AIPlayer(Player):
     #     self.probability = [10]
 
     def AI_init(self):
-        if not hasattr(self, "probability"):    # if probability matrix does not exist we create it 
-            self.create_probability()
+            # Innitiate AI player attibutes
+            self.probability = START_PROBABILITY
+            self.mask = [0 for i in range(100)]
+            self.moves = list(set(range(100)))
 
-        if not hasattr(self, "mask"):    # if mask cross does not exist we create it 
-            self._create_mask()
+    def AI_move(self, mode ="random"):
 
-        if not hasattr(self, "moves"):
-                self.moves = set(range(100))
-
-    def AI_move(self, mode = None):
-
-        if (mode == "diagonal_skewer"):
-           None
-        elif (mode == None):
+        if mode == "diagonal_skewer":
+           pass
+        elif mode == "radnom":
             selected_move = random.choice(list(self.moves))
-            self.moves.remove(selected_move)
+        elif mode == "H1":
+            selected_move = best_move(self) 
+        self.moves.remove(selected_move)
         return int(selected_move)
 
-    def create_probability(self):
-        self.probability = [8,11,14,15,16,16,15,14,11,8,
-                            11,14,16,17,18,18,17,16,14,11,
-                            14,16,18,19,19,19,19,18,16,14,
-                            15,17,19,20,20,20,20,19,17,15,
-                            16,18,19,20,21,21,20,19,18,16,
-                            16,18,19,20,21,21,20,19,18,16,
-                            15,17,19,20,20,20,20,19,17,15,
-                            14,16,18,19,19,19,19,18,16,14,
-                            11,14,16,17,18,18,17,16,14,11,
-                            8,11,14,15,16,16,15,14,11,8]
-    def _create_mask(self):
-        self.mask = []      # create mask full of zeros
-        for i in range(100):
-            self.mask.append(0)
            
 
     #mask works but only assigns ones
@@ -139,19 +153,7 @@ class AIPlayer(Player):
     #             distance = abs(row - row_index) + abs(col - col_index)
     #             self.mask[row * 10 + col] += max(0, 30 - distance * 5)
         
-    #     return self.mask
-
-
-    def heuristic(self, search, mask):
-        temp = []
-        for i in range(len(search)):
-            temp[i] = search[i] + mask[i]
-        return min(temp)
-
-        
-        return None
-    def choose_possible_move(self):
-        None
+    #   
 
 class BattleShipGame():
 
