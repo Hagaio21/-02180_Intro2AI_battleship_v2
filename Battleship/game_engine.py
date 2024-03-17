@@ -33,6 +33,7 @@ def set_mask(player):
     update_indexes = []
     if not hasattr(player, "mask"):
         player.mask = [*range(100)]
+        print(player.mask)
     else:
         for index ,value in enumerate(player.search):
             if value == "M" or value == "H" or value == "S":
@@ -194,26 +195,7 @@ class AIPlayer(Player):
     def update_mask(self, i):
         for i, indicies in enumerate(self.search):
             if indicies == "M":
-        # row_index = i // 10
-        # col_index = i % 10
-        # if self.search[i] == "M" and self.search[i+1] == "H":
-        #     for j in range(row_index*10, i):
-        #         self.mask[j] = 0 
-
-        # elif self.search[i] == "M" and self.search[i-1] =="H":
-        #     for j in range(i, (row_index+1)*10):
-        #         self.mask[j] = 0 
-
         
-        # elif self.search[i] == "M" and self.search[i+10] == "H":
-        #     for j in range(col_index,i,10):
-        #         self.mask[j] = 0 
-        
-        # elif self.search[i] == "M" and self.search[i-10] == "H":
-        #     for j in range(i,100, 10):
-        #         self.mask[j] = 0 
-
-
                 row_index = i // 10
                 col_index = i % 10
                 
@@ -244,7 +226,8 @@ class AIPlayer(Player):
 
 
     def reset_mask(self):
-        self.mask = [0 for i in range(100)]
+        # self.mask = [0 for i in range(100)]
+        self.mask = START_PROBABILITY
         # self.flag = 0
         # resets the mask
         # del self.mask
@@ -319,7 +302,7 @@ class BattleShipGame():
                 if sunk:
                     if active_player.name == "AI":
                         active_player.flag = 0
-                        active_player.reset_mask()
+                        active_player.mask = START_PROBABILITY
 
                         print("ship is sunk should create new mask")
                         # active_player.reset_mask()
@@ -338,8 +321,9 @@ class BattleShipGame():
             set_probability(active_player)
             set_mask(active_player)
             active_player.update_mask(i)
+            print(active_player.flag)
         
-            print(f"best AI move is {best_move(active_player)}")
+            # print(f"best AI move is {best_move(active_player)}")
         #####################################################
             
         

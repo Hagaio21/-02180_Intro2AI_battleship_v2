@@ -111,8 +111,8 @@ while is_game:
                 hide_ships = not hide_ships
 
     if not game.player1_turn:
+        time.sleep(1)
         game.make_move(game.player2.AI_move())
-        time.sleep(0.5)
             
             # elif not game.player1_turn and x > WIDTH - 10*SQ_SIZE  and y > 10*SQ_SIZE + V_MARGIN:
             #     row = (y - 10 * SQ_SIZE - V_MARGIN) // SQ_SIZE
