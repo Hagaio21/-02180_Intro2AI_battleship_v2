@@ -23,8 +23,10 @@ Orange - hit (+ extra turn), Blue - miss (pass the turn), Red - hit and sunk (+ 
 useful keys:
 
 h - hide/unhide the AI ships
+
 m - hide/unhide the AI probability decision mask. 
-ender - restart a new game
+
+enter - restart a new game
 
 
 
