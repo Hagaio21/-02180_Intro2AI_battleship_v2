@@ -1,5 +1,8 @@
 # Game Engine
 import random
+import AI_Player
+
+####### GLOBAL VARIABLES #############################################
 
 START_PROBABILITY =         [8,11,14,15,16,16,15,14,11,8,
                             11,14,16,17,18,18,17,16,14,11,
@@ -11,6 +14,11 @@ START_PROBABILITY =         [8,11,14,15,16,16,15,14,11,8,
                             14,16,18,19,19,19,19,18,16,14,
                             11,14,16,17,18,18,17,16,14,11,
                             8,11,14,15,16,16,15,14,11,8]
+
+####### GLOBAL VARIABLES END ##########################################
+
+###### AI PLAYER HELPER FUNCTIONS START ###############################
+
 def set_probability(player):
     update_indexes = []
     if not hasattr(player, "probability"):
@@ -33,26 +41,30 @@ def set_mask(player):
     for index in update_indexes:
         player.mask[index] = 0
 
-            
+
+# Heuristic function for choosing the best next move
+# The Heuristic function asign a value to the the AI can take     
 def heuristic(player, move):
     p = player
     m = move
     if hasattr(p, 'mask'):
-        h = p.probability[m]
+        h = p.probability[m] + p.mask[m]
     else:
         return 0
     return h
 
+# the best move function compare heuristics of all the moves,
+# then return the best move (move with the highest heuristic value)
 def best_move(player):
     best_m = player.moves[0]
     best_h = 0
     for m in player.moves:
         # compare heuristics
-        if  player.probability[m]+player.mask[m] > player.probability[best_m]+player.mask[best_m]:
+        if  heuristic(player, m) > heuristic(player, best_m):
             best_m = m
     return best_m
 
-
+###### AI PLAYER HELPER FUNCTIONS END ###############################
 class Ship:
     def __init__(self, size):
         self.row = random.randrange(0,9)
@@ -73,7 +85,7 @@ class Player():
         self.name = name
         self.ships = []
         self.search = ["U"  for i in range(100)] # "U" for "Unknown"
-        self.place_ships(sizes = [5, 4, 3, 3, 2])
+        self.place_ships(sizes = [5, 4, 4, 3, 3, 2, 2])
         list_of_list = [ship.indexes for ship in self.ships]
         self.indexes = [index for sublist in list_of_list for index in sublist]
         self.moves = list(set(range(100)))
@@ -119,12 +131,10 @@ class Player():
 
 
 
+################### AI PLAYER CODE START ###########################
 class AIPlayer(Player):
-    # needs to change the player1 board
-    # def __init__(self):
-    #     self.opponent_ships = [5,4,3,3,2]
-    #     self.probability = [10]
-
+   
+    # Initiate AI player with relevant mode
     def AI_init(self, mode):
             # Innitiate AI player attibutes
             self.probability = START_PROBABILITY
@@ -137,7 +147,7 @@ class AIPlayer(Player):
     def AI_log_state(self):
         self.log.append({'probabilty': self.probability, 'mask': self.mask, 'moves': self.moves})
 
-
+    # Logging fuction that saves all of the AI player states to an external file
     def save_AI_log(self):
         text = ""
         for turn, l in enumerate(self.log):
@@ -151,7 +161,7 @@ class AIPlayer(Player):
             file.write(text)
         print(f"File '{filename}' has been saved successfully.")
 
-
+    # AI move function
     def AI_move(self):
         if self.mode == "D": # if using diagonal skewer
     
@@ -178,10 +188,10 @@ class AIPlayer(Player):
         self.last_move = selected_move
         return int(selected_move)
 
-           
-
     #mask works but only assigns ones
     
+    # creates mask of values for the new search grid
+
     def create_mask(self, i):
         row_index = i // 10
         col_index = i % 10
@@ -199,20 +209,9 @@ class AIPlayer(Player):
             else:
                 distance = round(1/abs(i-j),2)
             self.mask[j] = 1100*distance
-        
 
-    # def create_mask(self, i):
-    #     row_index = i // 10
-    #     col_index = i % 10
-        
-    #     # Set the values for the cross
-    #     for row in range(10):
-    #         for col in range(10):
-    #             distance = abs(row - row_index) + abs(col - col_index)
-    #             self.mask[row * 10 + col] += max(0, 30 - distance * 5)
-        
-    #   
 
+################### AI PLAYER CODE END ###############################
 class BattleShipGame():
 
     def __init__(self):
@@ -263,13 +262,13 @@ class BattleShipGame():
             
         
         # Check if game over
-            game_over = True
-            for i in opponent.indexes:
-                if active_player.search[i] == "U":
-                    game_over = False
-            if game_over:
-                self.over = 1
-                self.winner = active_player
+        game_over = True
+        for i in opponent.indexes:
+            if active_player.search[i] == "U":
+                game_over = False
+        if game_over:
+            self.over = 1
+            self.winner = active_player
 
 
 

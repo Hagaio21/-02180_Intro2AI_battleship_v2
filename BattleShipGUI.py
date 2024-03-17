@@ -70,7 +70,7 @@ is_game = True
 is_paused = False
 ai_mask = False
 game = BattleShipGame()
-
+hide_ships = True
 
 while is_game:
 
@@ -106,6 +106,9 @@ while is_game:
             # toggle ai grid mask
             if event.key == pygame.K_m:
                 ai_mask = not ai_mask
+            
+            if event.key == pygame.K_h:
+                hide_ships = not hide_ships
 
     if not game.player1_turn:
         game.make_move(game.player2.AI_move())
@@ -133,9 +136,10 @@ while is_game:
         draw_grid(game.player2, top = (HEIGHT-V_MARGIN) //2 + V_MARGIN )
         
         # draw ships onto the ship grids
-
+        if  not hide_ships:
+            draw_ships(game.player2, left = (WIDTH-H_MARGIN) //2 + H_MARGIN)
         draw_ships(game.player1, top = (HEIGHT-V_MARGIN) //2 + V_MARGIN )
-        draw_ships(game.player2, left = (WIDTH-H_MARGIN) //2 + H_MARGIN)
+        
 
         # game over message
         if game.over == 1:
