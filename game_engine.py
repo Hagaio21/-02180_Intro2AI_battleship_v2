@@ -1,6 +1,5 @@
 # Game Engine
 import random
-import AI_Player
 
 ####### GLOBAL VARIABLES #############################################
 
