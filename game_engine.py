@@ -21,16 +21,24 @@ def set_probability(player):
                 update_indexes.append(index)
     for index in update_indexes:
         player.probability[index] = 0
-    ############################################
-    print(f"need to update {update_indexes} to 0")
-    ############################################
+
+def set_mask(player):
+    update_indexes = []
+    if not hasattr(player, "mask"):
+        player.mask = [*range(100)]
+    else:
+        for index ,value in enumerate(player.search):
+            if value == "M" or value == "H" or value == "S":
+                update_indexes.append(index)
+    for index in update_indexes:
+        player.mask[index] = 0
 
             
 def heuristic(player, move):
     p = player
     m = move
     if hasattr(p, 'mask'):
-        h = p.probability[m]+p.mask[m]
+        h = p.probability[m]
     else:
         return 0
     return h
@@ -39,11 +47,10 @@ def best_move(player):
     best_m = player.moves[0]
     best_h = 0
     for m in player.moves:
-        h = heuristic(player, m)
-        if  h >= best_h:
+        # compare heuristics
+        if  player.probability[m]+player.mask[m] > player.probability[best_m]+player.mask[best_m]:
             best_m = m
-            best_h = h
-    return m
+    return best_m
 
 
 class Ship:
@@ -211,7 +218,7 @@ class BattleShipGame():
     def __init__(self):
         self.player1 = Player("Player1")
         self.player2 = AIPlayer("AI")
-        self.player2.AI_init(mode='D')
+        self.player2.AI_init(mode='H1')
         self.player1_turn = 1
         self.over = 0
         self.winner = None
@@ -227,13 +234,6 @@ class BattleShipGame():
         active_player = self.player1 if self.player1_turn else self.player2
         opponent = self.player2 if self.player1_turn else self.player1
 
-        ########################-DEBUGCODE-############################
-        set_probability(active_player)
-        set_probability(opponent)
-        m1 = best_move(active_player)
-        m2 = best_move(opponent)
-        print(f"{active_player.name} best move is {m1} {opponent.name} best move is {m2}")
-        #########################-DEBUGCODE-#################################
 
         # set miss "M" or hit "H"
         if i in opponent.indexes:
@@ -250,11 +250,17 @@ class BattleShipGame():
                 if sunk:
                     for i in ship.indexes:
                         active_player.search[i] = "S"
-                        
         else:
             active_player.search[i] = "M"
             # Change turn
             self.change_turn()
+        #####################################################    
+        if active_player.name == "AI":
+            set_probability(active_player)
+            set_mask(active_player)
+            print(f"best AI move is {best_move(active_player)}")
+        #####################################################
+            
         
         # Check if game over
             game_over = True

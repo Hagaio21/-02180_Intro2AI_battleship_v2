@@ -22,27 +22,15 @@ GREY2 = (50, 70, 70)
 WHITE = (255, 250, 250)
 GREEN = (50, 200, 150)
 RED = (250,  50, 100)
+BLUE = (0, 150, 150)
 ORANGE = (255, 150, 20)
-COLORS = {"U": GREY, "S": RED, "M": WHITE, "H": ORANGE}
+COLORS = {"U": GREY, "S": RED, "M": BLUE, "H": ORANGE}
 # helper functions 
 
-def value_to_brg_heatmap(value, min_value=0, max_value=200):
+def value_to_brg_heatmap(value, min_value=0, max_value=100):
     # Normalize the value
     normalized = (value - min_value) / (max_value - min_value)
-
-    # Assuming a linear gradient from blue (low) to red (high) with green as midpoint
-    if normalized < 0.5:
-        # From blue to green
-        blue = 1.0
-        green = normalized * 2  # Increase green
-        red = 0
-    else:
-        # From green to red
-        blue = 1.0 - (normalized - 0.5) * 2  # Decrease blue
-        green = 1.0
-        red = (normalized - 0.5) * 2  # Increase red
-
-    return (int(blue * 255), int(red * 255), int(green * 255))
+    return (int(normalized * 255), int(normalized * 255), int(normalized * 255))
 
 # function that draws a grid
 def draw_grid(player, left=0, top=0, search = False, mask = False):
@@ -158,6 +146,6 @@ while is_game:
 
         # update screen
         pygame.display.flip()
-        
+
 game.player2.save_AI_log()
 pygame.quit()
