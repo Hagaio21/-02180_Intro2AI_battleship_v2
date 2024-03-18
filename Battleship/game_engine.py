@@ -33,7 +33,6 @@ def set_mask(player):
     update_indexes = []
     if not hasattr(player, "mask"):
         player.mask = [*range(100)]
-        print(player.mask)
     else:
         for index ,value in enumerate(player.search):
             if value == "M" or value == "H" or value == "S":
@@ -142,7 +141,11 @@ class AIPlayer(Player):
             self.mode = mode
             self.turn = 0
             self.log = []
-            self.flag = 0
+            self.is_zeroing_on_a_ship = "no"
+            self.last_move_result = ""
+            self.last_move_location = []
+            self.mask_flag = 0
+            
 
     # function that log states of AI.
     def AI_log_state(self):
@@ -189,9 +192,45 @@ class AIPlayer(Player):
         self.last_move = selected_move
         return int(selected_move)
 
+    def make_move_AI(self):
+        if self.is_zeroing_on_a_ship == "yes":
+            pass
+        elif self.is_zeroing_on_a_ship == 'no':
+            pass 
+
+
     #mask works but only assigns ones
     
     # creates mask of values for the new search grid
+
+    def create_mask(self, i):
+        if self.mask_flag == 0:
+            row_index = i // 10
+            col_index = i % 10
+            # Set the values for the row
+            for j in range(row_index * 10, (row_index + 1) * 10):
+                if ((i-j) == 0):
+                    distance = 0
+                else: 
+                    distance = round(1/(abs(i-j)*10),2)
+                self.mask[j] = 1100*distance
+            # Set the values for the column
+            for j in range(col_index, 100, 10):
+                if ((i-j) == 0):
+                    distance = 0
+                else:
+                    distance = round(1/abs(i-j),2)
+                self.mask[j] = 1100*distance
+            # raise created mask flag
+            self.mask_flag = 1 
+        # if there's already a mask, behave like this...:
+        elif self.mask_flag == 1:
+            pass
+    
+    def reset_mask(self):
+        self.mask_flag = 0
+        self.mask = [0 for i in  range(100)]
+    
     def update_mask(self, i):
         for i, indicies in enumerate(self.search):
             if indicies == "M":
@@ -217,51 +256,8 @@ class AIPlayer(Player):
                 # Check top neighbor
                 if row_index > 0 and self.search[i-10] == "H":
                     for j in range(i, 100, 10):
-                        self.mask[j] = 0 
-                        
-                print('went into update mask')
-
+                        self.mask[j] = 0
         
-
-
-
-    def reset_mask(self):
-        # self.mask = [0 for i in range(100)]
-        self.mask = START_PROBABILITY
-        # self.flag = 0
-        # resets the mask
-        # del self.mask
-
-
-    def create_mask(self, i):
-        if self.flag == 0:
-            row_index = i // 10
-            col_index = i % 10
-            # Set the values for the row
-            for j in range(row_index * 10, (row_index + 1) * 10):
-                if ((i-j) == 0):
-                    distance = 0
-                
-                else: 
-                    distance = round(1/(abs(i-j)*10),2)
-                self.mask[j] = 1100*distance
-            # Set the values for the column
-            for j in range(col_index, 100, 10):
-                if ((i-j) == 0):
-                    distance = 0
-                else:
-                    distance = round(1/abs(i-j),2)
-                self.mask[j] = 1100*distance
-            self.flag = 1
-            print("creating mask")
-        
-
-
-
-
-
-
-    
 
 
 ################### AI PLAYER CODE END ###############################
@@ -290,41 +286,45 @@ class BattleShipGame():
         # set miss "M" or hit "H"
         if i in opponent.indexes:
             active_player.search[i] = "H"
-            if active_player.name == "AI" and active_player.flag == 0:
-                active_player.create_mask(i)
+
+            ###############################
+            print("HIT!")
+            result = "H"
+            ###############################
             # check if ship is sunk ("S")
             for ship in opponent.ships:
-                sunk = True
-                for i in ship.indexes:
-                    if active_player.search[i] == "U":
+                sunk = True # assume ship is sunk
+                for j in ship.indexes:
+                    if active_player.search[j] == "U":
                         sunk = False
                         break
                 if sunk:
-                    if active_player.name == "AI":
-                        active_player.flag = 0
-                        active_player.mask = START_PROBABILITY
-
-                        print("ship is sunk should create new mask")
-                        # active_player.reset_mask()
-                    # if hasattr(active_player, "flag"):
-                    #     active_player.flag = 0
-                        # active_player.reset_mask()
-                
-                    for i in ship.indexes:
-                        active_player.search[i] = "S"
+                    for j in ship.indexes:
+                        active_player.search[j] = "S"
         else:
             active_player.search[i] = "M"
-            # Change turn
+            # Change turn if misses
             self.change_turn()
-        #####################################################    
+
+        # save the move result
+            
+        result = active_player.search[i]
+        ########################
+        print(result)
+        ########################
+        # check what to do next -- only for AI player
         if active_player.name == "AI":
-            set_probability(active_player)
-            set_mask(active_player)
+            
+            ####################################
+            print(f"result is {result}, AI mask flag is {active_player.mask_flag}")
+            ###################################
+            if result == "H":
+                active_player.create_mask(i)
+            if result == "S":
+                active_player.reset_mask()
+            if result == "M":
+                pass
             active_player.update_mask(i)
-            print(active_player.flag)
-        
-            # print(f"best AI move is {best_move(active_player)}")
-        #####################################################
             
         
         # Check if game over
@@ -335,4 +335,5 @@ class BattleShipGame():
         if game_over:
             self.over = 1
             self.winner = active_player
+
 
