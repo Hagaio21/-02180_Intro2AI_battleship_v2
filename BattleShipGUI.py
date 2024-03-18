@@ -17,7 +17,7 @@ INDENT = 4
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # colors
-GREY = (30, 42, 52)
+GREY = (30, 42, 70)
 GREY2 = (50, 70, 70)
 WHITE = (255, 250, 250)
 GREEN = (50, 200, 150)
@@ -63,7 +63,7 @@ def draw_ships(Player, left=0, top=0):
             width = SQ_SIZE - 2 * INDENT
             height = ship.size * SQ_SIZE - 2 * INDENT
         rectangle = pygame.Rect(x, y, width, height)
-        pygame.draw.rect(SCREEN, GREEN, rectangle, border_radius=15)
+        pygame.draw.rect(SCREEN, GREEN, rectangle, border_radius=3)
 
 # Pygame loop:
 is_game = True
@@ -113,12 +113,7 @@ while is_game:
     if not game.player1_turn:
         game.make_move(game.player2.AI_move())
         time.sleep(0.5)
-            
-            # elif not game.player1_turn and x > WIDTH - 10*SQ_SIZE  and y > 10*SQ_SIZE + V_MARGIN:
-            #     row = (y - 10 * SQ_SIZE - V_MARGIN) // SQ_SIZE
-            #     col = (x - 10 * SQ_SIZE - H_MARGIN) // SQ_SIZE
-            #     index = row * 10 + col
-            #     game.make_move(index)
+
     
             
 
