@@ -61,6 +61,11 @@ def best_move(player):
         # compare heuristics
         if  heuristic(player, m) > heuristic(player, best_m):
             best_m = m
+        elif heuristic(player, m) == heuristic(player, best_m):
+            result = random.randint(0, 1)
+            if result == 0:
+                best_m = m
+
     return best_m
 
 ###### AI PLAYER HELPER FUNCTIONS END ###############################
@@ -84,7 +89,7 @@ class Player():
         self.name = name
         self.ships = []
         self.search = ["U"  for i in range(100)] # "U" for "Unknown"
-        self.place_ships(sizes = [5, 4, 4, 3, 3, 2, 2])
+        self.place_ships(sizes = [5, 4, 3, 3, 2])
         list_of_list = [ship.indexes for ship in self.ships]
         self.indexes = [index for sublist in list_of_list for index in sublist]
         self.moves = list(set(range(100)))
